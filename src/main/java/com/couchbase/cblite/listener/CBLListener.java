@@ -19,6 +19,7 @@ public class CBLListener implements Runnable {
     private CBLHTTPServer httpServer;
     public static final String TAG = "CBLListener";
     private int listenPort;
+    private int serverStatus;
 
     //static inializer to ensure that cblite:// URLs are handled properly
     {
@@ -69,7 +70,7 @@ public class CBLListener implements Runnable {
 
     @Override
     public void run() {
-        httpServer.serve();
+        this.serverStatus = httpServer.serve();
     }
 
     public void start() {
@@ -87,8 +88,7 @@ public class CBLListener implements Runnable {
     }
 
     public String getStatus() {
-        String status = this.httpServer.getServerInfo();
-        return status;
+        return "" + this.serverStatus;
     }
 
     public int getListenPort() {
