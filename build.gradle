@@ -9,7 +9,7 @@ buildscript {
 apply plugin: 'android-library'
 
 repositories {
-    maven { url 'http://maven.hq.couchbase.com/nexus/content/repositories/releases/' }
+    maven { url 'http://files.stage.couchbase.com/maven2/' }
     mavenLocal()
     mavenCentral()
 }
