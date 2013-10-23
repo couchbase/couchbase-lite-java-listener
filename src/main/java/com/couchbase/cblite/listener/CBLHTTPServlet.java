@@ -1,5 +1,13 @@
 package com.couchbase.cblite.listener;
 
+import android.util.Log;
+
+import com.couchbase.cblite.CBLDatabase;
+import com.couchbase.cblite.CBLManager;
+import com.couchbase.cblite.router.CBLRouter;
+import com.couchbase.cblite.router.CBLRouterCallbackBlock;
+import com.couchbase.cblite.router.CBLURLConnection;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -14,23 +22,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import android.util.Log;
-
-import com.couchbase.cblite.CBLDatabase;
-import com.couchbase.cblite.internal.CBLServerInternal;
-import com.couchbase.cblite.router.CBLRouter;
-import com.couchbase.cblite.router.CBLRouterCallbackBlock;
-import com.couchbase.cblite.router.CBLURLConnection;
-
 @SuppressWarnings("serial")
 public class CBLHTTPServlet extends HttpServlet {
 
-    private CBLServerInternal server;
+    private CBLManager manager;
     private CBLListener listener;
     public static final String TAG = "CBLHTTPServlet";
 
-    public void setServer(CBLServerInternal server) {
-        this.server = server;
+    public void setManager(CBLManager manager) {
+        this.manager = manager;
     }
 
     public void setListener(CBLListener listener) {
@@ -41,15 +41,13 @@ public class CBLHTTPServlet extends HttpServlet {
     public void service(HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
 
-
-
         //set path
         String urlString = request.getRequestURI();
         String queryString = request.getQueryString();
         if(queryString != null) {
             urlString += "?" + queryString;
         }
-        URL url = new URL("cblite://" +  urlString);
+        URL url = new URL(CBLHTTPServer.CBL_URI_SCHEME +  urlString);
         final CBLURLConnection conn = (CBLURLConnection)url.openConnection();
         conn.setDoOutput(true);
 
@@ -78,7 +76,7 @@ public class CBLHTTPServlet extends HttpServlet {
 
         final CountDownLatch doneSignal = new CountDownLatch(1);
 
-        final CBLRouter router = new CBLRouter(server, conn);
+        final CBLRouter router = new CBLRouter(manager, conn);
 
         CBLRouterCallbackBlock callbackBlock = new CBLRouterCallbackBlock() {
 
@@ -104,7 +102,7 @@ public class CBLHTTPServlet extends HttpServlet {
 
         router.setCallbackBlock(callbackBlock);
 
-        synchronized (server) {
+        synchronized (manager) {
             router.start();
         }
 

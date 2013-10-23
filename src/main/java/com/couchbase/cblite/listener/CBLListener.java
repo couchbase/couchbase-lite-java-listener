@@ -1,18 +1,18 @@
 package com.couchbase.cblite.listener;
 
+import android.util.Log;
+
+import com.couchbase.cblite.CBLManager;
+import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ScheduledExecutorService;
 
-import android.util.Log;
-
-import com.couchbase.cblite.internal.CBLServerInternal;
-import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
-
 public class CBLListener implements Runnable {
 
     private Thread thread;
-    private CBLServerInternal server;
+    private CBLManager manager;
     private CBLHTTPServer httpServer;
     public static final String TAG = "CBLListener";
     private int listenPort;
@@ -30,10 +30,10 @@ public class CBLListener implements Runnable {
      * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
      *                      and this port can be discovered by calling getListenPort()
      */
-    public CBLListener(CBLServerInternal server, int suggestedPort) {
-        this.server = server;
+    public CBLListener(CBLManager manager, int suggestedPort) {
+        this.manager = manager;
         this.httpServer = new CBLHTTPServer();
-        this.httpServer.setServer(server);
+        this.httpServer.setManager(manager);
         this.httpServer.setListener(this);
         this.listenPort = discoverEmptyPort(suggestedPort);
         this.httpServer.setPort(this.listenPort);
@@ -80,7 +80,7 @@ public class CBLListener implements Runnable {
     }
 
     public void onServerThread(Runnable r) {
-        ScheduledExecutorService workExecutor = server.getWorkExecutor();
+        ScheduledExecutorService workExecutor = manager.getWorkExecutor();
         workExecutor.submit(r);
     }
 
