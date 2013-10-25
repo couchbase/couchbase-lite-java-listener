@@ -1,4 +1,3 @@
-
 ## CBLiteListener
 
 This provides a webserver wrapper around Couchbase-Lite so that it can be called via HTTP REST calls.
@@ -11,9 +10,9 @@ In it's current state, this is not easy because the dependent jars are not in a 
 
 - In the top level project, build the project as you normally would (eg, `./gradlew build` or something that calls it)
 
-- Find the CBLiteListener.aar file under the `build` directory
+- Find the couchbase-lite-android-listener.aar file under the `build` directory
 
-- Unzip CBLiteListener.aar and get the .jar file and dependent .jar files
+- Unzip couchbase-lite-android-listener.aar and get the .jar file and dependent .jar files
 
 - Copy these .jar files into your project's lib directory
 
