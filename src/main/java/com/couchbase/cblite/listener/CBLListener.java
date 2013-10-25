@@ -87,8 +87,8 @@ public class CBLListener implements Runnable {
         workExecutor.submit(r);
     }
 
-    public String getStatus() {
-        return "" + this.serverStatus;
+    public int serverStatus() {
+        return this.serverStatus;
     }
 
     public int getListenPort() {
