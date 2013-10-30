@@ -27,3 +27,17 @@ In order for this to happen, the first step is to get the webserver dependencies
 ## Webserver Dependencies
 
 Couchbase-lite android depends on the [Tiny Java Web Server and Servlet Container](http://tjws.sourceforge.net/).  See libs-src/Webserver-194-README.md for more details.
+
+## Ektorp Gotchas
+
+If you are connecting to CBLiteListener from a client that uses Ektorp, you may run into issues: issue #5, issue #7, or issue #8.
+
+The workaround is to call:
+
+```
+StdHttpClient.Builder builder = new StdHttpClient.Builder().host(hostName).port(port).useExpectContinue(false);
+return builder.build();
+```
+
+(the key point being to use `useExpectContinue(false)`)
+
