@@ -1,9 +1,9 @@
 package com.couchbase.cblite.listener;
 
-import android.util.Log;
 
 import com.couchbase.cblite.CBLManager;
 import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
+import com.couchbase.cblite.util.Log;
 
 import java.io.IOException;
 import java.net.ServerSocket;
