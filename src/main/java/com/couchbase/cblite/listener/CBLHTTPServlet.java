@@ -14,13 +14,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import android.util.Log;
-
 import com.couchbase.cblite.CBLDatabase;
 import com.couchbase.cblite.CBLServer;
 import com.couchbase.cblite.router.CBLRouter;
 import com.couchbase.cblite.router.CBLRouterCallbackBlock;
 import com.couchbase.cblite.router.CBLURLConnection;
+import com.couchbase.cblite.util.Log;
 
 @SuppressWarnings("serial")
 public class CBLHTTPServlet extends HttpServlet {
