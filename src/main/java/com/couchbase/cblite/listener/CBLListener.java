@@ -4,13 +4,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ScheduledExecutorService;
 
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.util.Log;
-
 import com.couchbase.cblite.CBLServer;
 import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
+import com.couchbase.cblite.util.Log;
 
 public class CBLListener implements Runnable {
 
