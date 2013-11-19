@@ -1,13 +1,11 @@
 package com.couchbase.cblite.listener;
 
-import android.util.Log;
-
-import java.util.Properties;
-
 import Acme.Serve.Serve;
-
+import android.util.Log;
 import com.couchbase.cblite.CBLServer;
 import com.couchbase.cblite.router.CBLRequestAuthorization;
+
+import java.util.Properties;
 
 @SuppressWarnings("serial")
 public class CBLHTTPServer extends Serve {
@@ -33,7 +31,7 @@ public class CBLHTTPServer extends Serve {
         }
     }
 
-    public int getListenPort() {
+    public CBLSocketStatus getSocketStatus() {
         // There are race conditions where the server is being initialized on one thread while a
         // caller is on another thread. In that case we can end up with acceptor being null because
         // initialization hasn't completed yet.
@@ -41,16 +39,16 @@ public class CBLHTTPServer extends Serve {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                Log.e("CBLHTTPServer","getListenPort sleep somehow got interrupted", e);
+                Log.e("CBLHTTPServer","getSocketStatus sleep somehow got interrupted", e);
             }
         }
 
         if (acceptor instanceof CBLAcceptor) {
-            return ((CBLAcceptor)acceptor).getPort();
+            return ((CBLAcceptor)acceptor).getCBLSocketStatus();
         }
 
-        Log.e("CBLHTTPServer","we were asked for port on an acceptor that doesn't implement CBLAcceptor interface.");
-        throw new RuntimeException("getListenPort is only supported on TJWS acceptors that support the CBLAcceptor interface.");
+        Log.e("CBLHTTPServer","we were asked for socket status on an acceptor that doesn't implement CBLSocketStatus interface.");
+        throw new RuntimeException("getSocketStatus is only supported on TJWS acceptors that support the CBLSocketStatus interface.");
     }
 
     @Override

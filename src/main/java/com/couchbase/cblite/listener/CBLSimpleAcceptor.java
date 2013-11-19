@@ -34,6 +34,8 @@
 
 package com.couchbase.cblite.listener;
 
+import Acme.Serve.Serve;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -41,15 +43,12 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Map;
 
-import Acme.Serve.Serve;
-import Acme.Serve.SimpleAcceptor;
-
 /**
  * Take from SimpleAcceptor.java in TJWS which made its socket private but we needed it to create
- * an acceptor that implements CBLAcceptor so we copied the code in order to get a version that
+ * an acceptor that implements CBLSocketStatus so we copied the code in order to get a version that
  * lets us access the socket.
  */
-public class CBLSimpleAcceptor implements CBLAcceptor {
+public class CBLSimpleAcceptor implements CBLAcceptor, Serve.Acceptor {
     public Socket accept() throws IOException {
         return socket.accept();
     }
@@ -95,9 +94,10 @@ public class CBLSimpleAcceptor implements CBLAcceptor {
         return "SimpleAcceptor " + socket;
     }
 
-    private ServerSocket socket;
+    protected ServerSocket socket;
 
-    public int getPort() {
-        return socket.getLocalPort();
+    @Override
+    public CBLSocketStatus getCBLSocketStatus() {
+        return new CBLSocketStatus(this.socket);
     }
 }

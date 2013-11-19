@@ -1,21 +1,12 @@
 package com.couchbase.cblite.listener;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.Properties;
-import java.util.concurrent.ScheduledExecutorService;
-
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.util.Log;
-
+import Acme.Serve.Serve;
 import com.couchbase.cblite.CBLServer;
-import com.couchbase.cblite.router.CBLRequestAuthorization;
 import com.couchbase.cblite.router.CBLRequestAuthorization;
 import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
 
-import Acme.Serve.Serve;
+import java.util.Properties;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class CBLListener implements Runnable {
 
@@ -74,7 +65,7 @@ public class CBLListener implements Runnable {
         workExecutor.submit(r);
     }
 
-    public int getListenPort() {
-        return this.httpServer.getListenPort();
+    public CBLSocketStatus getSocketStatus() {
+        return this.httpServer.getSocketStatus();
     }
 }

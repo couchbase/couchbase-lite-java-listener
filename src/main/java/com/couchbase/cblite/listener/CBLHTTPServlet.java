@@ -1,22 +1,7 @@
 package com.couchbase.cblite.listener;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-
-import javax.net.ssl.SSLSocket;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import Acme.Serve.Serve;
 import android.util.Log;
-
 import com.couchbase.cblite.CBLDatabase;
 import com.couchbase.cblite.CBLServer;
 import com.couchbase.cblite.router.CBLRequestAuthorization;
@@ -24,7 +9,19 @@ import com.couchbase.cblite.router.CBLRouter;
 import com.couchbase.cblite.router.CBLRouterCallbackBlock;
 import com.couchbase.cblite.router.CBLURLConnection;
 
-import Acme.Serve.Serve;
+import javax.net.ssl.SSLSocket;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 @SuppressWarnings("serial")
 public class CBLHTTPServlet extends HttpServlet {
@@ -89,7 +86,7 @@ public class CBLHTTPServlet extends HttpServlet {
 
         final CountDownLatch doneSignal = new CountDownLatch(1);
 
-        final CBLRouter router = new CBLRouter(server, conn);
+        final CBLRouter router = new CBLRouter(server, conn, cblRequestAuthorization);
 
         CBLRouterCallbackBlock callbackBlock = new CBLRouterCallbackBlock() {
 
