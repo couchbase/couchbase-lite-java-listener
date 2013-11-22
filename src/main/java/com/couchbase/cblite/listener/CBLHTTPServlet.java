@@ -64,9 +64,7 @@ public class CBLHTTPServlet extends HttpServlet {
 
         //set the body
         InputStream is = request.getInputStream();
-        //fixme dont think i should have to call available here
-        //but its blocking on get requests otherwise
-        if(is != null && is.available() > 0) {
+        if(is != null) {
             conn.setDoInput(true);
             conn.setRequestInputStream(is);
         }
