@@ -1,13 +1,13 @@
 package com.couchbase.cblite.listener;
 
 import Acme.Serve.Serve;
-import android.util.Log;
 import com.couchbase.cblite.CBLDatabase;
 import com.couchbase.cblite.CBLServer;
 import com.couchbase.cblite.router.CBLRequestAuthorization;
 import com.couchbase.cblite.router.CBLRouter;
 import com.couchbase.cblite.router.CBLRouterCallbackBlock;
 import com.couchbase.cblite.router.CBLURLConnection;
+import com.couchbase.cblite.util.Log;
 
 import javax.net.ssl.SSLSocket;
 import javax.servlet.ServletException;
@@ -73,8 +73,10 @@ public class CBLHTTPServlet extends HttpServlet {
 
         //set the body
         InputStream is = request.getInputStream();
-        conn.setDoInput(true);
-        conn.setRequestInputStream(is);
+        if(is != null) {
+            conn.setDoInput(true);
+            conn.setRequestInputStream(is);
+        }
 
         final ServletOutputStream os = response.getOutputStream();
         response.setBufferSize(128);

@@ -1,9 +1,19 @@
 package com.couchbase.cblite.listener;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.util.concurrent.ScheduledExecutorService;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+
 import Acme.Serve.Serve;
+
 import com.couchbase.cblite.CBLServer;
 import com.couchbase.cblite.router.CBLRequestAuthorization;
 import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
+import com.couchbase.cblite.util.Log;
 
 import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
@@ -33,8 +43,8 @@ public class CBLListener implements Runnable {
     /**
      *
      * @param server the CBLServer instance
-     * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
-     *                      and this port can be discovered by calling getListenPort()
+     * @param suggestedPort the port to use.  If 0 is chosen then the next free port will be used, the port
+							chosen can be discovered via getSocketStatu()
      * @param tjwsProperties    properties to be passed into the TJWS server instance. Note that if
      *                          port is set in these properties they will be overwritten by suggestedPort
      * @param cblRequestAuthorization Specifies the authorization policy, can be NULL
