@@ -1,17 +1,18 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.concurrent.ScheduledExecutorService;
 
-import com.couchbase.cblite.CBLServer;
-import com.couchbase.cblite.router.CBLURLStreamHandlerFactory;
-import com.couchbase.cblite.util.Log;
+
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.URLStreamHandlerFactory;
+import com.couchbase.lite.util.Log;
 
 public class CBLListener implements Runnable {
 
     private Thread thread;
-    private CBLServer server;
+    private Manager manager;
     private CBLHTTPServer httpServer;
     public static final String TAG = "CBLListener";
     private int listenPort;
@@ -19,20 +20,20 @@ public class CBLListener implements Runnable {
 
     //static inializer to ensure that cblite:// URLs are handled properly
     {
-        CBLURLStreamHandlerFactory.registerSelfIgnoreError();
+        URLStreamHandlerFactory.registerSelfIgnoreError();
     }
 
     /**
      * CBLListener constructor
      *
-     * @param server the CBLServer instance
+     * @param server the CBLServerInternal instance
      * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
      *                      and this port can be discovered by calling getListenPort()
      */
-    public CBLListener(CBLServer server, int suggestedPort) {
-        this.server = server;
+    public CBLListener(Manager manager, int suggestedPort) {
+        this.manager = manager;
         this.httpServer = new CBLHTTPServer();
-        this.httpServer.setServer(server);
+        this.httpServer.setManager(manager);
         this.httpServer.setListener(this);
         this.listenPort = discoverEmptyPort(suggestedPort);
         this.httpServer.setPort(this.listenPort);
@@ -79,7 +80,7 @@ public class CBLListener implements Runnable {
     }
 
     public void onServerThread(Runnable r) {
-        ScheduledExecutorService workExecutor = server.getWorkExecutor();
+        ScheduledExecutorService workExecutor = manager.getWorkExecutor();
         workExecutor.submit(r);
     }
 

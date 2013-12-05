@@ -1,4 +1,11 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
+
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.Router;
+import com.couchbase.lite.router.RouterCallbackBlock;
+import com.couchbase.lite.router.URLConnection;
+import com.couchbase.lite.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,22 +21,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.couchbase.cblite.CBLDatabase;
-import com.couchbase.cblite.CBLServer;
-import com.couchbase.cblite.router.CBLRouter;
-import com.couchbase.cblite.router.CBLRouterCallbackBlock;
-import com.couchbase.cblite.router.CBLURLConnection;
-import com.couchbase.cblite.util.Log;
-
 @SuppressWarnings("serial")
 public class CBLHTTPServlet extends HttpServlet {
 
-    private CBLServer server;
+    private Manager manager;
     private CBLListener listener;
     public static final String TAG = "CBLHTTPServlet";
 
-    public void setServer(CBLServer server) {
-        this.server = server;
+    public void setManager(Manager manager) {
+        this.manager = manager;
     }
 
     public void setListener(CBLListener listener) {
@@ -40,16 +40,14 @@ public class CBLHTTPServlet extends HttpServlet {
     public void service(HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
 
-
-
         //set path
         String urlString = request.getRequestURI();
         String queryString = request.getQueryString();
         if(queryString != null) {
             urlString += "?" + queryString;
         }
-        URL url = new URL("cblite://" +  urlString);
-        final CBLURLConnection conn = (CBLURLConnection)url.openConnection();
+        URL url = new URL(CBLHTTPServer.CBL_URI_SCHEME +  urlString);
+        final URLConnection conn = (URLConnection)url.openConnection();
         conn.setDoOutput(true);
 
         //set the method
@@ -71,13 +69,13 @@ public class CBLHTTPServlet extends HttpServlet {
 
         final ServletOutputStream os = response.getOutputStream();
         response.setBufferSize(128);
-        Log.v(CBLDatabase.TAG, String.format("Buffer size is %d", response.getBufferSize()));
+        Log.v(Database.TAG, String.format("Buffer size is %d", response.getBufferSize()));
 
         final CountDownLatch doneSignal = new CountDownLatch(1);
 
-        final CBLRouter router = new CBLRouter(server, conn);
+        final Router router = new Router(manager, conn);
 
-        CBLRouterCallbackBlock callbackBlock = new CBLRouterCallbackBlock() {
+        RouterCallbackBlock callbackBlock = new RouterCallbackBlock() {
 
             @Override
             public void onResponseReady() {
@@ -101,7 +99,7 @@ public class CBLHTTPServlet extends HttpServlet {
 
         router.setCallbackBlock(callbackBlock);
 
-        synchronized (server) {
+        synchronized (manager) {
             router.start();
         }
 
@@ -117,7 +115,7 @@ public class CBLHTTPServlet extends HttpServlet {
             }
             os.close();
         } catch (InterruptedException e) {
-            Log.e(CBLDatabase.TAG, "Interrupted waiting for result", e);
+            Log.e(Database.TAG, "Interrupted waiting for result", e);
         } finally {
             if(router != null) {
                 router.stop();

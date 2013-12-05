@@ -1,26 +1,27 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
+
+import com.couchbase.lite.Manager;
 
 import java.util.Properties;
 
 import Acme.Serve.Serve;
 
-import com.couchbase.cblite.CBLServer;
-
 @SuppressWarnings("serial")
 public class CBLHTTPServer extends Serve {
 
-    public static final String CBLServer_KEY = "CBLServer";
+    public static final String CBLServer_KEY = "CBLServerInternal";
+    public static final String CBL_URI_SCHEME = "cblite://";
 
     private Properties props;
-    private CBLServer server;
+    private Manager manager;
     private CBLListener listener;
 
     public CBLHTTPServer() {
         props = new Properties();
     }
 
-    public void setServer(CBLServer server) {
-        this.server = server;
+    public void setManager(Manager manager) {
+        this.manager = manager;
     }
 
     public void setListener(CBLListener listener) {
@@ -36,9 +37,9 @@ public class CBLHTTPServer extends Serve {
         //pass our custom properties in
         this.arguments = props;
 
-        //pass in the CBLServer to the servlet
+        //pass in the CBLServerInternal to the servlet
         CBLHTTPServlet servlet = new CBLHTTPServlet();
-        servlet.setServer(server);
+        servlet.setManager(manager);
         servlet.setListener(listener);
 
         this.addServlet("/", servlet);
