@@ -9,12 +9,12 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.router.URLStreamHandlerFactory;
 import com.couchbase.lite.util.Log;
 
-public class CBLListener implements Runnable {
+public class LiteListener implements Runnable {
 
     private Thread thread;
     private Manager manager;
-    private CBLHTTPServer httpServer;
-    public static final String TAG = "CBLListener";
+    private LiteServer httpServer;
+    public static final String TAG = "LiteListener";
     private int listenPort;
     private int serverStatus;
 
@@ -24,15 +24,15 @@ public class CBLListener implements Runnable {
     }
 
     /**
-     * CBLListener constructor
+     * LiteListener constructor
      *
      * @param server the CBLServerInternal instance
      * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
      *                      and this port can be discovered by calling getListenPort()
      */
-    public CBLListener(Manager manager, int suggestedPort) {
+    public LiteListener(Manager manager, int suggestedPort) {
         this.manager = manager;
-        this.httpServer = new CBLHTTPServer();
+        this.httpServer = new LiteServer();
         this.httpServer.setManager(manager);
         this.httpServer.setListener(this);
         this.listenPort = discoverEmptyPort(suggestedPort);
@@ -58,7 +58,7 @@ public class CBLListener implements Runnable {
                 socket.close();
                 return curPort;
             } catch (IOException e) {
-                Log.d(CBLListener.TAG, "Could not bind to port: " + curPort + ".  Trying another port.");
+                Log.d(LiteListener.TAG, "Could not bind to port: " + curPort + ".  Trying another port.");
             }
 
         }

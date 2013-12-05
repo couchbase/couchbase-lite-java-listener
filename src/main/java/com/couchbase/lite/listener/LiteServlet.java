@@ -22,17 +22,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
-public class CBLHTTPServlet extends HttpServlet {
+public class LiteServlet extends HttpServlet {
 
     private Manager manager;
-    private CBLListener listener;
-    public static final String TAG = "CBLHTTPServlet";
+    private LiteListener listener;
+    public static final String TAG = "LiteServlet";
 
     public void setManager(Manager manager) {
         this.manager = manager;
     }
 
-    public void setListener(CBLListener listener) {
+    public void setListener(LiteListener listener) {
         this.listener = listener;
     }
 
@@ -46,7 +46,7 @@ public class CBLHTTPServlet extends HttpServlet {
         if(queryString != null) {
             urlString += "?" + queryString;
         }
-        URL url = new URL(CBLHTTPServer.CBL_URI_SCHEME +  urlString);
+        URL url = new URL(LiteServer.CBL_URI_SCHEME +  urlString);
         final URLConnection conn = (URLConnection)url.openConnection();
         conn.setDoOutput(true);
 

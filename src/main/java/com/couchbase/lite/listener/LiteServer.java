@@ -7,16 +7,16 @@ import java.util.Properties;
 import Acme.Serve.Serve;
 
 @SuppressWarnings("serial")
-public class CBLHTTPServer extends Serve {
+public class LiteServer extends Serve {
 
     public static final String CBLServer_KEY = "CBLServerInternal";
     public static final String CBL_URI_SCHEME = "cblite://";
 
     private Properties props;
     private Manager manager;
-    private CBLListener listener;
+    private LiteListener listener;
 
-    public CBLHTTPServer() {
+    public LiteServer() {
         props = new Properties();
     }
 
@@ -24,7 +24,7 @@ public class CBLHTTPServer extends Serve {
         this.manager = manager;
     }
 
-    public void setListener(CBLListener listener) {
+    public void setListener(LiteListener listener) {
         this.listener = listener;
     }
 
@@ -38,7 +38,7 @@ public class CBLHTTPServer extends Serve {
         this.arguments = props;
 
         //pass in the CBLServerInternal to the servlet
-        CBLHTTPServlet servlet = new CBLHTTPServlet();
+        LiteServlet servlet = new LiteServlet();
         servlet.setManager(manager);
         servlet.setListener(listener);
 
