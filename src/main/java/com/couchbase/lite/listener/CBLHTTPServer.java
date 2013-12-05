@@ -1,6 +1,6 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
 
-import com.couchbase.cblite.CBLManager;
+import com.couchbase.lite.Manager;
 
 import java.util.Properties;
 
@@ -13,14 +13,14 @@ public class CBLHTTPServer extends Serve {
     public static final String CBL_URI_SCHEME = "cblite://";
 
     private Properties props;
-    private CBLManager manager;
+    private Manager manager;
     private CBLListener listener;
 
     public CBLHTTPServer() {
         props = new Properties();
     }
 
-    public void setManager(CBLManager manager) {
+    public void setManager(Manager manager) {
         this.manager = manager;
     }
 

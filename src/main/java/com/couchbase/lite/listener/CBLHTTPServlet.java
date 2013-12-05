@@ -1,12 +1,11 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
 
-import android.util.Log;
-
-import com.couchbase.cblite.CBLDatabase;
-import com.couchbase.cblite.CBLManager;
-import com.couchbase.cblite.router.CBLRouter;
-import com.couchbase.cblite.router.CBLRouterCallbackBlock;
-import com.couchbase.cblite.router.CBLURLConnection;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.Router;
+import com.couchbase.lite.router.RouterCallbackBlock;
+import com.couchbase.lite.router.URLConnection;
+import com.couchbase.lite.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,11 +25,11 @@ import javax.servlet.http.HttpServletResponse;
 @SuppressWarnings("serial")
 public class CBLHTTPServlet extends HttpServlet {
 
-    private CBLManager manager;
+    private Manager manager;
     private CBLListener listener;
     public static final String TAG = "CBLHTTPServlet";
 
-    public void setManager(CBLManager manager) {
+    public void setManager(Manager manager) {
         this.manager = manager;
     }
 
@@ -49,7 +48,7 @@ public class CBLHTTPServlet extends HttpServlet {
             urlString += "?" + queryString;
         }
         URL url = new URL(CBLHTTPServer.CBL_URI_SCHEME +  urlString);
-        final CBLURLConnection conn = (CBLURLConnection)url.openConnection();
+        final URLConnection conn = (URLConnection)url.openConnection();
         conn.setDoOutput(true);
 
         //set the method
@@ -73,13 +72,13 @@ public class CBLHTTPServlet extends HttpServlet {
 
         final ServletOutputStream os = response.getOutputStream();
         response.setBufferSize(128);
-        Log.v(CBLDatabase.TAG, String.format("Buffer size is %d", response.getBufferSize()));
+        Log.v(Database.TAG, String.format("Buffer size is %d", response.getBufferSize()));
 
         final CountDownLatch doneSignal = new CountDownLatch(1);
 
-        final CBLRouter router = new CBLRouter(manager, conn);
+        final Router router = new Router(manager, conn);
 
-        CBLRouterCallbackBlock callbackBlock = new CBLRouterCallbackBlock() {
+        RouterCallbackBlock callbackBlock = new RouterCallbackBlock() {
 
             @Override
             public void onResponseReady() {
@@ -119,7 +118,7 @@ public class CBLHTTPServlet extends HttpServlet {
             }
             os.close();
         } catch (InterruptedException e) {
-            Log.e(CBLDatabase.TAG, "Interrupted waiting for result", e);
+            Log.e(Database.TAG, "Interrupted waiting for result", e);
         } finally {
             if(router != null) {
                 router.stop();

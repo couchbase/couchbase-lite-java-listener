@@ -1,4 +1,4 @@
-package com.couchbase.cblite.testapp.listener.tests;
+package com.couchbase.lite.testapp.listener.tests;
 
 import android.test.InstrumentationTestCase;
 
