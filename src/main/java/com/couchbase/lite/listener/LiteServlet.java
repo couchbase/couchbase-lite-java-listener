@@ -1,13 +1,13 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
 
 import Acme.Serve.Serve;
-import com.couchbase.cblite.CBLDatabase;
-import com.couchbase.cblite.CBLServer;
-import com.couchbase.cblite.router.CBLRequestAuthorization;
-import com.couchbase.cblite.router.CBLRouter;
-import com.couchbase.cblite.router.CBLRouterCallbackBlock;
-import com.couchbase.cblite.router.CBLURLConnection;
-import com.couchbase.cblite.util.Log;
+import com.couchbase.lite.Database;
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.RequestAuthorization;
+import com.couchbase.lite.router.Router;
+import com.couchbase.lite.router.RouterCallbackBlock;
+import com.couchbase.lite.router.URLConnection;
+import com.couchbase.lite.util.Log;
 
 import javax.net.ssl.SSLSocket;
 import javax.servlet.ServletException;
@@ -24,21 +24,22 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
 @SuppressWarnings("serial")
-public class CBLHTTPServlet extends HttpServlet {
+public class LiteServlet extends HttpServlet {
 
-    private final CBLServer server;
-    private final CBLRequestAuthorization cblRequestAuthorization;
-    public static final String TAG = "CBLHTTPServlet";
+    private Manager manager;
+    private LiteListener listener;
+    public static final String TAG = "LiteServlet";
+    private final RequestAuthorization requestAuthorization;
 
     /**
      *
-     * @param server
-     * @param cblRequestAuthorization This can be null if no authorize check is being used
+     * @param manager
+     * @param requestAuthorization This can be null if no authorize check is being used
      */
-    public CBLHTTPServlet(CBLServer server, CBLRequestAuthorization cblRequestAuthorization) {
+    public LiteServlet(Manager manager, RequestAuthorization requestAuthorization) {
         super();
-        this.server = server;
-        this.cblRequestAuthorization = cblRequestAuthorization;
+        this.manager = manager;
+        this.requestAuthorization = requestAuthorization;
     }
 
     @Override
@@ -50,8 +51,8 @@ public class CBLHTTPServlet extends HttpServlet {
         if(queryString != null) {
             urlString += "?" + queryString;
         }
-        URL url = new URL("cblite://" +  urlString);
-        final CBLURLConnection conn = (CBLURLConnection)url.openConnection();
+        URL url = new URL(LiteServer.CBL_URI_SCHEME +  urlString);
+        final URLConnection conn = (URLConnection)url.openConnection();
         conn.setDoOutput(true);
 
         //find SSL session, if any
@@ -80,13 +81,13 @@ public class CBLHTTPServlet extends HttpServlet {
 
         final ServletOutputStream os = response.getOutputStream();
         response.setBufferSize(128);
-        Log.v(CBLDatabase.TAG, String.format("Buffer size is %d", response.getBufferSize()));
+        Log.v(Database.TAG, String.format("Buffer size is %d", response.getBufferSize()));
 
         final CountDownLatch doneSignal = new CountDownLatch(1);
 
-        final CBLRouter router = new CBLRouter(server, conn, cblRequestAuthorization);
+        final Router router = new Router(manager, conn, requestAuthorization);
 
-        CBLRouterCallbackBlock callbackBlock = new CBLRouterCallbackBlock() {
+        RouterCallbackBlock callbackBlock = new RouterCallbackBlock() {
 
             @Override
             public void onResponseReady() {
@@ -110,7 +111,7 @@ public class CBLHTTPServlet extends HttpServlet {
 
         router.setCallbackBlock(callbackBlock);
 
-        synchronized (server) {
+        synchronized (manager) {
             router.start();
         }
 
@@ -126,7 +127,7 @@ public class CBLHTTPServlet extends HttpServlet {
             }
             os.close();
         } catch (InterruptedException e) {
-            Log.e(CBLDatabase.TAG, "Interrupted waiting for result", e);
+            Log.e(Database.TAG, "Interrupted waiting for result", e);
         } finally {
             if(router != null) {
                 router.stop();

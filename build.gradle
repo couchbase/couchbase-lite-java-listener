@@ -23,7 +23,7 @@ android {
     buildToolsVersion "17.0.0"
 
     defaultConfig {
-        minSdkVersion 7
+        minSdkVersion 9
         targetSdkVersion 16
     }
 }
@@ -56,8 +56,8 @@ uploadArchives {
             }
 
             pom.version = System.properties['UPLOAD_VERSION_CBLITE']
-            pom.groupId = 'com.couchbase.cblite'
-            pom.artifactId = 'CBListener'
+            pom.groupId = 'com.couchbase.lite'
+            pom.artifactId = 'Listener'
             pom.project {
                 licenses {
                     license {

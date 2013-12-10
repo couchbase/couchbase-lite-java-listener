@@ -32,7 +32,7 @@
  */
 
 
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
 
 import Acme.Serve.Serve;
 
@@ -45,10 +45,10 @@ import java.util.Map;
 
 /**
  * Take from SimpleAcceptor.java in TJWS which made its socket private but we needed it to create
- * an acceptor that implements CBLSocketStatus so we copied the code in order to get a version that
+ * an acceptor that implements SocketStatus so we copied the code in order to get a version that
  * lets us access the socket.
  */
-public class CBLSimpleAcceptor implements CBLAcceptor, Serve.Acceptor {
+public class SimpleAcceptor implements LiteAcceptor, Serve.Acceptor {
     public Socket accept() throws IOException {
         return socket.accept();
     }
@@ -97,7 +97,7 @@ public class CBLSimpleAcceptor implements CBLAcceptor, Serve.Acceptor {
     protected ServerSocket socket;
 
     @Override
-    public CBLSocketStatus getCBLSocketStatus() {
-        return new CBLSocketStatus(this.socket);
+    public SocketStatus getSocketStatus() {
+        return new SocketStatus(this.socket);
     }
 }

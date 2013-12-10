@@ -1,4 +1,4 @@
-package com.couchbase.cblite.listener;
+package com.couchbase.lite.listener;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -6,10 +6,10 @@ import java.net.ServerSocket;
 /**
  * Provides read only status on a socket.
  */
-public class CBLSocketStatus {
+public class SocketStatus {
     protected ServerSocket serverSocket;
 
-    public CBLSocketStatus(ServerSocket serverSocket) {
+    public SocketStatus(ServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
 
