@@ -1,21 +1,22 @@
 buildscript {
     repositories {
-        maven { url 'http://repo1.maven.org/maven2' }
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:0.6.+'
     }
 }
 apply plugin: 'android-library'
+apply plugin: 'maven'
 
 repositories {
-    maven { url 'http://files.couchbase.com/maven2/' }
     mavenLocal()
+    maven { url 'http://files.couchbase.com/maven2/' }
     mavenCentral()
 }
 
-// apply from: 'dependencies-archive.gradle'    // <- enable this when building an .aar
-apply from: 'dependencies-test.gradle'       // <- enable this when testing
+apply from: 'dependencies-archive.gradle'    // <- enable this when building an .aar
+// apply from: 'dependencies-test.gradle'       // <- enable this when testing
 
 android {
     compileSdkVersion 17
@@ -27,11 +28,60 @@ android {
     }
 }
 
+task createMavenDirectory(type: Exec) {
+
+    ext {
+        uploadUser = System.getenv("UPLOAD_USERNAME") + ":" + System.getenv("UPLOAD_PASSWORD")
+        mkcolPath = System.getenv("UPLOAD_MAVEN_REPO_URL") + "com/couchbase/cblite/CBListener/" + System.getenv("UPLOAD_VERSION_CBLITE") + "/"
+    }
+    commandLine "curl", "--user", uploadUser, "-X", "MKCOL", mkcolPath
+}
+
+// this hack is only needed for apache mod_dav based Maven repo's like file.couchbase.com.  otherwise, skip it
+createMavenDirectory.onlyIf { System.getenv("UPLOAD_MAVEN_REPO_URL").contains("files") }
+
+task uploadArchivesWrapper(dependsOn: createMavenDirectory) << {
+    uploadArchives.execute()
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if (System.getProperty('localOnlyBuild', "false") == "true") {
+                repository url: 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath
+            } else {
+                repository(url: System.getenv("UPLOAD_MAVEN_REPO_URL")) {
+                    authentication(userName: System.getenv("UPLOAD_USERNAME"), password: System.getenv("UPLOAD_PASSWORD"))
+                }
+            }
+
+            pom.version = System.properties['UPLOAD_VERSION_CBLITE']
+            pom.groupId = 'com.couchbase.lite'
+            pom.artifactId = 'Listener'
+            pom.project {
+                licenses {
+                    license {
+                        name 'Couchbase Community Edition License Agreement'
+                        url 'http://www.couchbase.com/agreement/community'
+                        distribution 'repo'
+                    }
+                }
+            }
+        }
+    }
+}
+
+task install(dependsOn: uploadArchives)
+
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from android.sourceSets.main.java.srcDirs
 }
 
-task generateJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
+artifacts {
+    archives sourcesJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.8'
 }

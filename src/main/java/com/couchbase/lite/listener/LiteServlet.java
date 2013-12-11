@@ -1,12 +1,20 @@
 package com.couchbase.lite.listener;
 
+import Acme.Serve.Serve;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.RequestAuthorization;
 import com.couchbase.lite.router.Router;
 import com.couchbase.lite.router.RouterCallbackBlock;
 import com.couchbase.lite.router.URLConnection;
 import com.couchbase.lite.util.Log;
 
+import javax.net.ssl.SSLSocket;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -15,31 +23,28 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 @SuppressWarnings("serial")
 public class LiteServlet extends HttpServlet {
 
     private Manager manager;
     private LiteListener listener;
     public static final String TAG = "LiteServlet";
+    private final RequestAuthorization requestAuthorization;
 
-    public void setManager(Manager manager) {
+    /**
+     *
+     * @param manager
+     * @param requestAuthorization This can be null if no authorize check is being used
+     */
+    public LiteServlet(Manager manager, RequestAuthorization requestAuthorization) {
+        super();
         this.manager = manager;
-    }
-
-    public void setListener(LiteListener listener) {
-        this.listener = listener;
+        this.requestAuthorization = requestAuthorization;
     }
 
     @Override
     public void service(HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
-
         //set path
         String urlString = request.getRequestURI();
         String queryString = request.getQueryString();
@@ -49,6 +54,13 @@ public class LiteServlet extends HttpServlet {
         URL url = new URL(LiteServer.CBL_URI_SCHEME +  urlString);
         final URLConnection conn = (URLConnection)url.openConnection();
         conn.setDoOutput(true);
+
+        //find SSL session, if any
+        Serve.ServeConnection serveConnection = (Serve.ServeConnection)request; // This only works for TJWS
+        if (serveConnection.getSocket() instanceof SSLSocket) {
+            SSLSocket sslSocket = (SSLSocket) serveConnection.getSocket();
+            conn.setSSLSession(sslSocket.getSession());
+        }
 
         //set the method
         conn.setRequestMethod(request.getMethod());
@@ -73,7 +85,7 @@ public class LiteServlet extends HttpServlet {
 
         final CountDownLatch doneSignal = new CountDownLatch(1);
 
-        final Router router = new Router(manager, conn);
+        final Router router = new Router(manager, conn, requestAuthorization);
 
         RouterCallbackBlock callbackBlock = new RouterCallbackBlock() {
 
@@ -123,5 +135,4 @@ public class LiteServlet extends HttpServlet {
         }
 
     }
-
 }
