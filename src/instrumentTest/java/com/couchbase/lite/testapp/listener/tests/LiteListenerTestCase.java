@@ -1,8 +1,8 @@
 package com.couchbase.lite.testapp.listener.tests;
 
-import android.test.InstrumentationTestCase;
+import junit.framework.TestCase;
 
-public abstract class LiteListenerTestCase extends InstrumentationTestCase {
+public abstract class LiteListenerTestCase extends TestCase {
 
 
 }
