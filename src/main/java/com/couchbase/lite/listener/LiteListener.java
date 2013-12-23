@@ -1,13 +1,12 @@
 package com.couchbase.lite.listener;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.concurrent.ScheduledExecutorService;
-
-
+import Acme.Serve.Serve;
 import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.RequestAuthorization;
 import com.couchbase.lite.router.URLStreamHandlerFactory;
-import com.couchbase.lite.util.Log;
+
+import java.util.Properties;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class LiteListener implements Runnable {
 
@@ -15,10 +14,8 @@ public class LiteListener implements Runnable {
     private Manager manager;
     private LiteServer httpServer;
     public static final String TAG = "LiteListener";
-    private int listenPort;
-    private int serverStatus;
 
-    //static inializer to ensure that cblite:// URLs are handled properly
+    //static initializer to ensure that cblite:// URLs are handled properly
     {
         URLStreamHandlerFactory.registerSelfIgnoreError();
     }
@@ -26,53 +23,36 @@ public class LiteListener implements Runnable {
     /**
      * LiteListener constructor
      *
-     * @param server the CBLServerInternal instance
-     * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
-     *                      and this port can be discovered by calling getListenPort()
+     * @param port the suggested port to use. If 0 is specified then the next available port will be picked.
      */
-    public LiteListener(Manager manager, int suggestedPort) {
-        this.manager = manager;
-        this.httpServer = new LiteServer();
-        this.httpServer.setManager(manager);
-        this.httpServer.setListener(this);
-        this.listenPort = discoverEmptyPort(suggestedPort);
-        this.httpServer.setPort(this.listenPort);
+    public LiteListener(Manager manager, int port) {
+        this(manager, port, new Properties(), null);
     }
 
     /**
-     * Hunt for an empty port starting from startPort by binding a server
-     * socket until it succeeds w/o getting an exception.  Once found, close
-     * the server socket so that port is available.
      *
-     * Caveat: yes, there is a tiny race condition in the sense that the
-     * caller could receive a port that was bound by another thread
-     * before it has a chance to bind)
-     *
-     * @param startPort - the port to start hunting at, eg: 5984
-     * @return the port that was bound.  (or a runtime exception is thrown)
+     * @param manager 
+     * @param port the port to use.  If 0 is chosen then the next free port will be used, the port
+							chosen can be discovered via getSocketStatu()
+     * @param tjwsProperties    properties to be passed into the TJWS server instance. Note that if
+     *                          port is set in these properties they will be overwritten by suggestedPort
+     * @param requestAuthorization Specifies the authorization policy, can be NULL
      */
-    public int discoverEmptyPort(int startPort) {
-        for (int curPort=startPort; curPort<65536; curPort++) {
-            try {
-                ServerSocket socket = new ServerSocket(curPort);
-                socket.close();
-                return curPort;
-            } catch (IOException e) {
-                Log.d(LiteListener.TAG, "Could not bind to port: " + curPort + ".  Trying another port.");
-            }
-
-        }
-        throw new RuntimeException("Could not find empty port starting from: " + startPort);
+    public LiteListener(Manager manager, int port, Properties tjwsProperties, RequestAuthorization requestAuthorization) {
+        this.manager = manager;
+        tjwsProperties.put(Serve.ARG_PORT, port);
+        this.httpServer = new LiteServer(manager, tjwsProperties, requestAuthorization);
     }
 
     @Override
     public void run() {
-        this.serverStatus = httpServer.serve();
+        httpServer.serve();
     }
 
-    public void start() {
+    public int start() {
         thread = new Thread(this);
         thread.start();
+        return 0;
     }
 
     public void stop() {
@@ -84,11 +64,7 @@ public class LiteListener implements Runnable {
         workExecutor.submit(r);
     }
 
-    public int serverStatus() {
-        return this.serverStatus;
-    }
-
-    public int getListenPort() {
-        return listenPort;
+    public SocketStatus getSocketStatus() {
+        return this.httpServer.getSocketStatus();
     }
 }
