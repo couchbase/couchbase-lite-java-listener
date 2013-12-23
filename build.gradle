@@ -8,6 +8,7 @@ buildscript {
 }
 apply plugin: 'android-library'
 apply plugin: 'maven'
+apply plugin: 'eclipse'
 
 repositories {
     mavenLocal()
@@ -26,22 +27,6 @@ android {
         minSdkVersion 9
         targetSdkVersion 16
     }
-}
-
-task createMavenDirectory(type: Exec) {
-
-    ext {
-        uploadUser = System.getenv("UPLOAD_USERNAME") + ":" + System.getenv("UPLOAD_PASSWORD")
-        mkcolPath = System.getenv("UPLOAD_MAVEN_REPO_URL") + "com/couchbase/cblite/CBListener/" + System.getenv("UPLOAD_VERSION_CBLITE") + "/"
-    }
-    commandLine "curl", "--user", uploadUser, "-X", "MKCOL", mkcolPath
-}
-
-// this hack is only needed for apache mod_dav based Maven repo's like file.couchbase.com.  otherwise, skip it
-createMavenDirectory.onlyIf { System.getenv("UPLOAD_MAVEN_REPO_URL").contains("files") }
-
-task uploadArchivesWrapper(dependsOn: createMavenDirectory) << {
-    uploadArchives.execute()
 }
 
 uploadArchives {
