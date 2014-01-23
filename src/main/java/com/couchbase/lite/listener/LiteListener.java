@@ -26,7 +26,7 @@ public class LiteListener implements Runnable {
     /**
      * LiteListener constructor
      *
-     * @param server the CBLServerInternal instance
+     * @param manager the Manager instance
      * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
      *                      and this port can be discovered by calling getListenPort()
      */
