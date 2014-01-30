@@ -26,6 +26,10 @@ android {
         minSdkVersion 9
         targetSdkVersion 19
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 task sourcesJar(type: Jar) {
