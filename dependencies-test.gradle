@@ -1,7 +1,5 @@
 dependencies {
 
-    compile 'com.android.support:support-v4:13.0.+'
-
     compile project(':libraries:couchbase-lite-java-core')
 
     // these could be maven artifacts, however they have not been packaged into a maven
