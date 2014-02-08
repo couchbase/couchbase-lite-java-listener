@@ -1,12 +1,9 @@
 dependencies {
 
-    // the cblite core library dependency is included as a maven archive because when declaring
-    // as a "compile project" dependency any projects that include this library will get errors.
-    // documented here: https://groups.google.com/forum/?fromgroups#!topic/adt-dev/H2Jk2rVs6G8
-    compile 'com.couchbase.cblite:CBLite:' + System.getenv("UPLOAD_VERSION_CBLITE")
+    testCompile group: 'junit', name: 'junit', version: '4.11'
 
-    // these should be maven artifacts.  as it stands, the artifact generated for CBLiteListener
-    // will fail since it won't be able to find these dependencies
-    compile files('libs/servlet-api-2.4.jar', 'libs/webserver.jar')
+    compile 'com.couchbase.lite:java-core:' + System.getenv("UPLOAD_VERSION_CBLITE")
+    compile 'com.couchbase.cblite:servlet:2-3'
+    compile 'com.couchbase.cblite:webserver:2-3'
 
 }

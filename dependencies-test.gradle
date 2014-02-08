@@ -1,5 +1,7 @@
 dependencies {
 
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
     compile project(':libraries:couchbase-lite-java-core')
 
     // these could be maven artifacts, however they have not been packaged into a maven
