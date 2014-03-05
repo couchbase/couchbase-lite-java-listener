@@ -1,9 +1,0 @@
-dependencies {
-
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-
-    compile 'com.couchbase.lite:java-core:1.0.0-beta3rc1'
-    compile 'com.couchbase.cblite:servlet:2-3'
-    compile 'com.couchbase.cblite:webserver:2-3'
-
-}

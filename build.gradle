@@ -16,8 +16,21 @@ repositories {
     mavenCentral()
 }
 
-// apply from: 'dependencies-archive.gradle'    // <- enable this when building an .aar
-apply from: 'dependencies-test.gradle'       // <- enable this when testing
+def buildListenerWithArtifacts = System.getProperty("buildListenerWithArtifacts")
+
+dependencies {
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    compile 'com.couchbase.cblite:servlet:2-3'
+    compile 'com.couchbase.cblite:webserver:2-3'
+
+    compile buildListenerWithArtifacts == null ?
+            project(':libraries:couchbase-lite-java-core') :
+            'com.couchbase.lite:java-core:' + System.getenv("UPLOAD_VERSION_CBLITE")
+
+
+}
 
 task createMavenDirectory(type: Exec) {
 
