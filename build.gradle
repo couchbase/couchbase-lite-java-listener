@@ -4,8 +4,8 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 
 repositories {
-    maven { url 'http://files.couchbase.com/maven2/' }
     mavenLocal()
+    maven { url 'http://files.couchbase.com/maven2/' }
     mavenCentral()
 }
 
