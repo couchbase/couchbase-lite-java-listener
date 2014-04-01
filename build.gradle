@@ -4,7 +4,6 @@ apply plugin: 'maven'
 apply plugin: 'eclipse'
 
 repositories {
-    mavenLocal()
     maven { url 'http://files.couchbase.com/maven2/' }
     mavenCentral()
 }
