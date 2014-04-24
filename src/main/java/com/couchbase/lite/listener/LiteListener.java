@@ -58,7 +58,7 @@ public class LiteListener implements Runnable {
                 socket.close();
                 return curPort;
             } catch (IOException e) {
-                Log.d(LiteListener.TAG, "Could not bind to port: " + curPort + ".  Trying another port.");
+                Log.w(LiteListener.TAG, "Could not bind to port: %d.  Trying another port.", curPort);
             }
 
         }
