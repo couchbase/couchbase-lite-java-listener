@@ -5,14 +5,17 @@ import com.couchbase.lite.Manager;
 import com.couchbase.lite.router.Router;
 import com.couchbase.lite.router.RouterCallbackBlock;
 import com.couchbase.lite.router.URLConnection;
+import com.couchbase.lite.support.Base64;
 import com.couchbase.lite.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.concurrent.CountDownLatch;
 
 import javax.servlet.ServletException;
@@ -26,7 +29,12 @@ public class LiteServlet extends HttpServlet {
 
     private Manager manager;
     private LiteListener listener;
-    public static final String TAG = "LiteServlet";
+
+    // if this is non-null, then users must present BasicAuth
+    // credential in every request which matches up with allowedCredentials,
+    // or else the request will be refused.
+    // REF: https://github.com/couchbase/couchbase-lite-java-listener/issues/35
+    private Credentials allowedCredentials;
 
     public void setManager(Manager manager) {
         this.manager = manager;
@@ -36,9 +44,31 @@ public class LiteServlet extends HttpServlet {
         this.listener = listener;
     }
 
+    public void setAllowedCredentials(Credentials allowedCredentials) {
+        this.allowedCredentials = allowedCredentials;
+    }
+
     @Override
     public void service(HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
+
+        Credentials requestCredentials = credentialsWithBasicAuthentication(request);
+
+        if (allowedCredentials != null && !allowedCredentials.empty()) {
+            if (requestCredentials == null) {
+                Log.w(Log.TAG_LISTENER, "Unauthorized -- requestCredentials not given");
+                response.setStatus(401);
+                return;
+            }
+            if (!requestCredentials.equals(allowedCredentials)) {
+                Log.w(Log.TAG_LISTENER, "Unauthorized -- requestCredentials do not match allowedCredentials");
+                response.setStatus(401);
+                return;
+            }
+            Log.v(Log.TAG_LISTENER, "Authorized via basic auth");
+        } else {
+            Log.v(Log.TAG_LISTENER, "Not enforcing basic auth -- allowedCredentials null or empty");
+        }
 
         //set path
         String urlString = request.getRequestURI();
@@ -114,7 +144,7 @@ public class LiteServlet extends HttpServlet {
             }
             os.close();
         } catch (InterruptedException e) {
-            Log.e(Database.TAG, "Interrupted waiting for result", e);
+            Log.e(Log.TAG_LISTENER, "Interrupted waiting for result", e);
         } finally {
             if(router != null) {
                 router.stop();
@@ -122,5 +152,41 @@ public class LiteServlet extends HttpServlet {
         }
 
     }
+
+    public Credentials credentialsWithBasicAuthentication(HttpServletRequest req) {
+        try {
+            String authHeader = req.getHeader("Authorization");
+            if (authHeader != null) {
+                StringTokenizer st = new StringTokenizer(authHeader);
+                if (st.hasMoreTokens()) {
+                    String basic = st.nextToken();
+                        if (basic.equalsIgnoreCase("Basic")) {
+                        try {
+                            String credentials = new String(Base64.decode(st.nextToken()), "UTF-8");
+                            Log.v(Log.TAG_LISTENER, "Credentials: ", credentials);
+                            int p = credentials.indexOf(":");
+                            if (p != -1) {
+                                String login = credentials.substring(0, p).trim();
+                                String password = credentials.substring(p + 1).trim();
+
+                                return new Credentials(login, password);
+                            } else {
+                                Log.e(Log.TAG_LISTENER, "Invalid authentication token");
+                            }
+                        } catch (Exception e) {
+                            Log.w(Log.TAG_LISTENER, "Couldn't retrieve authentication", e);
+                        }
+                    }
+                }
+            } else {
+                Log.w(Log.TAG_LISTENER, "authHeader is null");
+            }
+        } catch (Exception e) {
+            Log.e(Log.TAG_LISTENER, "Exception getting basic auth credentials", e);
+        }
+
+        return null;
+    }
+
 
 }
