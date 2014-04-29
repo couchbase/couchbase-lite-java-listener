@@ -29,14 +29,17 @@ public class LiteListener implements Runnable {
      * @param manager the Manager instance
      * @param suggestedPort the suggested port to use.  if not available, will hunt for a new port.
      *                      and this port can be discovered by calling getListenPort()
+     * @param allowedCredentials any clients connecting to this liteserv must present these
+     *                           credentials.
      */
-    public LiteListener(Manager manager, int suggestedPort) {
+    public LiteListener(Manager manager, int suggestedPort, Credentials allowedCredentials) {
         this.manager = manager;
         this.httpServer = new LiteServer();
         this.httpServer.setManager(manager);
         this.httpServer.setListener(this);
         this.listenPort = discoverEmptyPort(suggestedPort);
         this.httpServer.setPort(this.listenPort);
+        this.httpServer.setAllowedCredentials(allowedCredentials);
     }
 
     /**
@@ -91,4 +94,5 @@ public class LiteListener implements Runnable {
     public int getListenPort() {
         return listenPort;
     }
+
 }

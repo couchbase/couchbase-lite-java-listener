@@ -16,6 +16,12 @@ public class LiteServer extends Serve {
     private Manager manager;
     private LiteListener listener;
 
+    // if this is non-null, then users must present BasicAuth
+    // credential in every request which matches up with allowedCredentials,
+    // or else the request will be refused.
+    // REF: https://github.com/couchbase/couchbase-lite-java-listener/issues/35
+    private Credentials allowedCredentials;
+
     public LiteServer() {
         props = new Properties();
     }
@@ -26,6 +32,10 @@ public class LiteServer extends Serve {
 
     public void setListener(LiteListener listener) {
         this.listener = listener;
+    }
+
+    public void setAllowedCredentials(Credentials allowedCredentials) {
+        this.allowedCredentials = allowedCredentials;
     }
 
     public void setPort(int port) {
@@ -41,6 +51,9 @@ public class LiteServer extends Serve {
         LiteServlet servlet = new LiteServlet();
         servlet.setManager(manager);
         servlet.setListener(listener);
+        if (allowedCredentials != null) {
+            servlet.setAllowedCredentials(allowedCredentials);
+        }
 
         this.addServlet("/", servlet);
         return super.serve();
