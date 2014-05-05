@@ -55,13 +55,9 @@ public class LiteServlet extends HttpServlet {
         Credentials requestCredentials = credentialsWithBasicAuthentication(request);
 
         if (allowedCredentials != null && !allowedCredentials.empty()) {
-            if (requestCredentials == null) {
-                Log.w(Log.TAG_LISTENER, "Unauthorized -- requestCredentials not given");
-                response.setStatus(401);
-                return;
-            }
-            if (!requestCredentials.equals(allowedCredentials)) {
-                Log.w(Log.TAG_LISTENER, "Unauthorized -- requestCredentials do not match allowedCredentials");
+            if (requestCredentials == null || !requestCredentials.equals(allowedCredentials)) {
+                Log.w(Log.TAG_LISTENER, "Unauthorized -- requestCredentials not given or do not match allowed credentials");
+                response.setHeader("WWW-Authenticate", "Basic realm=\"Couchbase Lite\"");
                 response.setStatus(401);
                 return;
             }
