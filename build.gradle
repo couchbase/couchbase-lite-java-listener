@@ -6,9 +6,9 @@ apply plugin: 'eclipse'
 sourceCompatibility = '1.6'
 
 repositories {
+    mavenLocal()
     maven { url 'http://files.couchbase.com/maven2/' }
     mavenCentral()
-    mavenLocal()
 }
 
 def buildListenerWithArtifacts = System.getProperty("buildListenerWithArtifacts")
@@ -43,10 +43,16 @@ task uploadArchivesWrapper(dependsOn: createMavenDirectory) << {
     uploadArchives.execute()
 }
 
+def mavenPath() {
+    System.getenv("MAVEN_BUILD_LOCAL") == "true" ?
+            'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath :
+            System.getenv("MAVEN_UPLOAD_REPO_URL")
+}
+
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository(url: System.getenv("MAVEN_UPLOAD_REPO_URL")) {
+            repository(url: mavenPath()) {
                 authentication(userName: System.getenv("MAVEN_UPLOAD_USERNAME"), password: System.getenv("MAVEN_UPLOAD_PASSWORD"))
             }
             pom.version = System.getenv("MAVEN_UPLOAD_VERSION")  
@@ -65,3 +71,11 @@ uploadArchives {
     }
 }
 
+task sourcesJar(type: Jar) { 
+    classifier = 'sources'
+    from sourceSets.main.java.srcDirs
+}
+
+artifacts { 
+    archives sourcesJar
+}
