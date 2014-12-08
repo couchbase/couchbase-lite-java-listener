@@ -5,6 +5,6 @@
 : ${MAVEN_UPLOAD_REPO_URL:?"Need to set MAVEN_UPLOAD_REPO_URL non-empty"}
 
 #at first build all projects
-./gradlew :libraries:couchbase-lite-java-core:build && ./gradlew :build -DbuildAndroidWithArtifacts &&
+./gradlew :libraries:couchbase-lite-java-core:build && ./gradlew :build -DbuildListenerWithArtifacts &&
 #then upload artifacts
-./gradlew :uploadArchivesWrapper -DbuildAndroidWithArtifacts
+./gradlew :uploadArchivesWrapper -DbuildListenerWithArtifacts
