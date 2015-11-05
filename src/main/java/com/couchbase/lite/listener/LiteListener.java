@@ -2,6 +2,7 @@ package com.couchbase.lite.listener;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 
 
@@ -32,7 +33,8 @@ public class LiteListener implements Runnable {
      * @param allowedCredentials any clients connecting to this liteserv must present these
      *                           credentials.
      */
-    public LiteListener(Manager manager, int suggestedPort, Credentials allowedCredentials) {
+
+    public LiteListener(Manager manager, int suggestedPort, Credentials allowedCredentials, Properties tjwsProperties) {
         this.manager = manager;
         this.httpServer = new LiteServer();
         this.httpServer.setManager(manager);
@@ -40,6 +42,11 @@ public class LiteListener implements Runnable {
         this.listenPort = discoverEmptyPort(suggestedPort);
         this.httpServer.setPort(this.listenPort);
         this.httpServer.setAllowedCredentials(allowedCredentials);
+        this.httpServer.setProps(tjwsProperties);
+    }
+
+    public LiteListener(Manager manager, int suggestedPort, Credentials allowedCredentials) {
+        this(manager, suggestedPort, allowedCredentials, new Properties());
     }
 
     /**
