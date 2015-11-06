@@ -34,6 +34,10 @@ public class LiteServer extends Serve {
         this.listener = listener;
     }
 
+    public void setProps(Properties properties) {
+        this.props = properties;
+    }
+
     public void setAllowedCredentials(Credentials allowedCredentials) {
         this.allowedCredentials = allowedCredentials;
     }
