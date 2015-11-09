@@ -37,12 +37,12 @@ public class LiteListener implements Runnable {
     public LiteListener(Manager manager, int suggestedPort, Credentials allowedCredentials, Properties tjwsProperties) {
         this.manager = manager;
         this.httpServer = new LiteServer();
+        this.httpServer.setProps(tjwsProperties);
         this.httpServer.setManager(manager);
         this.httpServer.setListener(this);
         this.listenPort = discoverEmptyPort(suggestedPort);
         this.httpServer.setPort(this.listenPort);
         this.httpServer.setAllowedCredentials(allowedCredentials);
-        this.httpServer.setProps(tjwsProperties);
     }
 
     public LiteListener(Manager manager, int suggestedPort, Credentials allowedCredentials) {
