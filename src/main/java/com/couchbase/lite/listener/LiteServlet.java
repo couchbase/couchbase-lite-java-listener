@@ -56,7 +56,7 @@ public class LiteServlet extends HttpServlet {
 
         if (allowedCredentials != null && !allowedCredentials.empty()) {
             if (requestCredentials == null || !requestCredentials.equals(allowedCredentials)) {
-                Log.w(Log.TAG_LISTENER, "Unauthorized -- requestCredentials not given or do not match allowed credentials");
+                Log.d(Log.TAG_LISTENER, "Unauthorized -- requestCredentials not given or do not match allowed credentials");
                 response.setHeader("WWW-Authenticate", "Basic realm=\"Couchbase Lite\"");
                 response.setStatus(401);
                 return;
@@ -175,7 +175,7 @@ public class LiteServlet extends HttpServlet {
                     }
                 }
             } else {
-                Log.w(Log.TAG_LISTENER, "authHeader is null");
+                Log.d(Log.TAG_LISTENER, "authHeader is null");
             }
         } catch (Exception e) {
             Log.e(Log.TAG_LISTENER, "Exception getting basic auth credentials", e);
