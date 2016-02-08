@@ -1,6 +1,5 @@
 package com.couchbase.lite.listener;
 
-import com.couchbase.lite.Database;
 import com.couchbase.lite.Manager;
 import com.couchbase.lite.router.Router;
 import com.couchbase.lite.router.RouterCallbackBlock;
@@ -10,7 +9,6 @@ import com.couchbase.lite.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
