@@ -9,6 +9,7 @@ import com.couchbase.lite.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
@@ -122,6 +123,9 @@ public class LiteServlet extends HttpServlet {
 
         router.setCallbackBlock(callbackBlock);
 
+        // set remote URL as source
+        router.setSource(remoteURL(request));
+
         synchronized (manager) {
             router.start();
         }
@@ -182,5 +186,30 @@ public class LiteServlet extends HttpServlet {
         return null;
     }
 
+    private URL remoteURL(HttpServletRequest req) {
+        String addr = req.getRemoteAddr();
+        Log.v(Log.TAG_LISTENER, "remoteURL() addr=" + addr);
+        if (!"127.0.0.1".equals(addr) && !"::1".equals(addr)) {
+            // IPv6
+            if (addr.indexOf(':') >= 0)
+                addr = String.format("[%s]", addr);
+
+
+            String username = allowedCredentials != null ? allowedCredentials.getLogin() : null;
+            String protocol = req.isSecure() ? "https" : "http";
+            String spec = null;
+            if(username != null && username.length() > 0)
+                spec = String.format("%s://%s@%s/", protocol, username, addr);
+            else
+                spec = String.format("%s://%s/", protocol, addr);
+            try {
+                return new URL(spec);
+            } catch (MalformedURLException e) {
+                Log.w(Log.TAG_LISTENER, "failed to create remote URL", e);
+                return null;
+            }
+        }
+        return null;
+    }
 
 }
