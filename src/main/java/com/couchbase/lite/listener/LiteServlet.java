@@ -91,18 +91,16 @@ public class LiteServlet extends HttpServlet {
         InputStream is = request.getInputStream();
         if(is != null) {
             {
+                // ((Acme.Serve.Serve.ServeInputStream)is).conn.getSocket().setSoTimeout(30);
                 try {
                     Field privateServeConnection = Acme.Serve.Serve.ServeInputStream.class.getDeclaredField("conn");
                     privateServeConnection.setAccessible(true);
                     Acme.Serve.Serve.ServeConnection serveConnection = (Acme.Serve.Serve.ServeConnection) privateServeConnection.get(is);
                     Socket socket = serveConnection.getSocket();
                     socket.setSoTimeout(listener.getSocketTimeout());
-                } catch (IllegalAccessException iae) {
-                    iae.printStackTrace();
-                } catch (NoSuchFieldException nfe) {
-                    nfe.printStackTrace();
+                } catch (Exception ex) {
+                    Log.e(Log.TAG_LISTENER, "Exception by reflection" , ex);
                 }
-                //((Acme.Serve.Serve.ServeInputStream)is).conn.getSocket().setSoTimeout(30);
             }
             conn.setDoInput(true);
             conn.setRequestInputStream(is);
