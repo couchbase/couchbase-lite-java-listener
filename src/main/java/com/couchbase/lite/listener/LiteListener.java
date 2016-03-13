@@ -1,16 +1,17 @@
 package com.couchbase.lite.listener;
 
+import com.couchbase.lite.Manager;
+import com.couchbase.lite.router.URLStreamHandlerFactory;
+import com.couchbase.lite.util.Log;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.Properties;
 import java.util.concurrent.ScheduledExecutorService;
 
-
-import com.couchbase.lite.Manager;
-import com.couchbase.lite.router.URLStreamHandlerFactory;
-import com.couchbase.lite.util.Log;
-
 public class LiteListener implements Runnable {
+
+    private static int DEF_SOCKET_TIMEOUT = 30 * 1000;
 
     private Thread thread;
     private Manager manager;
@@ -18,6 +19,15 @@ public class LiteListener implements Runnable {
     public static final String TAG = "LiteListener";
     private int listenPort;
     private int serverStatus;
+    private int socketTimeout = DEF_SOCKET_TIMEOUT;
+
+    public int getSocketTimeout() {
+        return socketTimeout;
+    }
+
+    public void setSocketTimeout(int socketTimeout) {
+        this.socketTimeout = socketTimeout;
+    }
 
     //static inializer to ensure that cblite:// URLs are handled properly
     {

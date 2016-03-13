@@ -9,7 +9,9 @@ import com.couchbase.lite.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.List;
@@ -88,6 +90,20 @@ public class LiteServlet extends HttpServlet {
         //set the body
         InputStream is = request.getInputStream();
         if(is != null) {
+            {
+                try {
+                    Field privateServeConnection = Acme.Serve.Serve.ServeInputStream.class.getDeclaredField("conn");
+                    privateServeConnection.setAccessible(true);
+                    Acme.Serve.Serve.ServeConnection serveConnection = (Acme.Serve.Serve.ServeConnection) privateServeConnection.get(is);
+                    Socket socket = serveConnection.getSocket();
+                    socket.setSoTimeout(listener.getSocketTimeout());
+                } catch (IllegalAccessException iae) {
+                    iae.printStackTrace();
+                } catch (NoSuchFieldException nfe) {
+                    nfe.printStackTrace();
+                }
+                //((Acme.Serve.Serve.ServeInputStream)is).conn.getSocket().setSoTimeout(30);
+            }
             conn.setDoInput(true);
             conn.setRequestInputStream(is);
         }
