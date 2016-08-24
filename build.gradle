@@ -3,7 +3,8 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'eclipse'
 
-sourceCompatibility = '1.6'
+sourceCompatibility = JavaVersion.VERSION_1_6
+targetCompatibility = JavaVersion.VERSION_1_6
 
 repositories {
     mavenLocal()
