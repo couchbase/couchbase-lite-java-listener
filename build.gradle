@@ -12,6 +12,15 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java.srcDirs = [
+                'src/main/java',
+                'vendor/tjws/src/java'
+        ]
+    }
+}
+
 def buildListenerWithArtifacts = System.getProperty("buildListenerWithArtifacts")
 
 dependencies {
@@ -19,13 +28,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
 
     compile 'com.couchbase.cblite:servlet:2-3'
-    compile 'com.couchbase.cblite:webserver:2-3'
 
     compile buildListenerWithArtifacts == null ?
             project(':libraries:couchbase-lite-java-core') :
             'com.couchbase.lite:couchbase-lite-java-core:' + System.getenv("MAVEN_UPLOAD_VERSION")
-
-
 }
 
 task createMavenDirectory(type: Exec) {
