@@ -53,6 +53,12 @@ public class LiteServlet extends HttpServlet {
     public void service(HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
 
+        if (request != null)
+            Log.i(Log.TAG_LISTENER, "[REQUEST] (%s) %s: %s",
+                    Thread.currentThread().getName(),
+                    request.getMethod(),
+                    getFullURL(request));
+
         Credentials requestCredentials = credentialsWithBasicAuthentication(request);
 
         if (allowedCredentials != null && !allowedCredentials.empty()) {
@@ -220,5 +226,16 @@ public class LiteServlet extends HttpServlet {
             }
         }
         return null;
+    }
+
+    public static String getFullURL(HttpServletRequest request) {
+        StringBuffer requestURL = request.getRequestURL();
+        String queryString = request.getQueryString();
+
+        if (queryString == null) {
+            return requestURL.toString();
+        } else {
+            return requestURL.append('?').append(queryString).toString();
+        }
     }
 }
