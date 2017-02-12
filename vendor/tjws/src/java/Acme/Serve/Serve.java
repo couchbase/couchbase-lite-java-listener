@@ -4140,6 +4140,16 @@ public class Serve implements ServletContext, Serializable {
 		        out.println(String.valueOf(contentLen));
 		    }
 		}
+
+			// In case keepalive=true and times of requested eqauls with max times connection use,
+			// set connection: close, and reset keepalive header value.
+			// Because some of client does not take care keep-alive max parameter.
+			// REF: https://github.com/couchbase/couchbase-lite-java-core/issues/1592
+			if (timesRequested == serve.getMaxTimesConnectionUse() - 1) {
+				setHeader(CONNECTION, "close");
+				setHeader(KEEPALIVE, null);
+			}
+
 		// process keep alive headers
 		Object o = resHeaderNames.get(CONNECTION);
 		if (o instanceof String) {
